@@ -1,0 +1,22 @@
+<?php
+function revString($str){
+  $len = strlen($str);
+  $getStr="";
+  for($i=$len-1;$i>=0;$i--){
+      $getStr = $getStr.$str[$i];
+  }
+  return $getStr;
+}
+function isPalindrome($str){
+  $genStr = strtolower(preg_replace("/[^a-zA-Z0-9]/","",$str));
+  $revGenStr = revString($genStr);
+  return $genStr === strrev($genStr);
+}
+
+$checkStr = isPalindrome("A man, a plan, a canal, Panama!");
+if($checkStr){
+    echo "String is valid palindrome";
+}else{
+    echo "String is not a valid palindrome";
+}
+

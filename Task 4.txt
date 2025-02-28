@@ -1,0 +1,28 @@
+1. performance issues:
+
+*Lack of indexing in status column.Without indexing , query will perform full table scan that is slower when there is situation to manage large amount of data.
+
+* Pagination is absent. Pagination allows to get data from database through small chunk.By this process, it is possible to decrease load in database.
+
+*Din't use select() method. All data is not necessary for a particular request.Specific data can be selected by select() that increases performance.
+
+*Caching is absent. Caching store data for a defined time.If same request is perform again again then data is fetched from cache instead of database.
+
+2.Query optimization:
+
+*Creating index for status column:
+
+php artisan make:migration add_index_to_employees --table=employees
+
+public function up(): void
+{
+Schema::table('employees', function (Blueprint $table) {
+    $table->index('name');
+});
+}
+
+$employess = Cache::remember('employee_cache'.request('page',1),600,function(){
+   return Employee::where('status', 'active') 
+             ->select('id','name','email')  
+             ->paginate(100)
+});
