@@ -1,0 +1,128 @@
+I fetched data which birthday is matched  for specific employees and then sent mail through laravel mail system and automate the process through scheduler.This system sent email at 12:01 AM everyday.I tested  functionlity through mailtrap and my personal gmail account.php artisan schedule:work command is necessary for running scheduler.
+
+1. .env file
+
+APP_NAME=Birthday 
+
+*Mailtrap creadential
+MAIL_MAILER=smtp
+MAIL_HOST=sandbox.smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=
+MAIL_PASSWORD=
+
+*Gmail creadential
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=saifulislamraihan64@gmail.com
+MAIL_PASSWORD=
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="saifulislamraihan64@gmail.com"
+MAIL_FROM_NAME="${APP_NAME}"
+
+2.Command creation
+
+*app/commands/SendBirthdayNotification.php
+
+use Carbon\Carbon;
+use DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BirthdayNotificationMail;
+
+class SendBirthdayNotification extends Command
+{
+    
+    protected $signature = 'app:send-birthday-notification';
+
+    
+    protected $description = 'Birthday Notification Send';
+
+    
+    public function handle()
+    {
+        $today = Carbon::now();
+        $employes = DB::table('employees')
+                     ->whereMonth('date_of_birth',$today->month)
+                     ->whereDay('date_of_birth',$today->day)
+                     ->get();
+        
+        foreach($employes as $employee){
+            Mail::to($employee->email)->send(new BirthdayNotificationMail($employee));
+        }
+
+    }
+}
+
+
+3.Handle Schedule
+
+*app/Console/Kernel.php:
+
+protected function schedule(Schedule $schedule): void
+{
+ $schedule->command('app:send-birthday-notification')->daily('12:01');
+}
+
+
+4.Mail system
+
+*app/Mail/BirthdayNotificationMail:
+
+class BirthdayNotificationMail extends Mailable
+{
+    use Queueable, SerializesModels;
+    
+    public $employee;
+    
+    public function __construct($employee)
+    {
+        $this->employee = $employee;
+    }
+
+    
+    public function envelope(): Envelope
+    {
+        return new Envelope(
+            subject: 'Birthday Notification Mail',
+        );
+    }
+
+    
+    public function content(): Content
+    {
+        return new Content(
+            view: 'Mail.mail',
+            with: ['employee'=>$this->employee]
+        );
+    }
+
+    
+}
+
+*resources/Mail/mail.blade.php:
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Mail Sent</title>
+</head>
+<body>
+    <h2>Wish you happy birthday Mr. {{ $employee->name }}</h2>
+    <h4>Regards</h4>
+    <h4>Credence Group Bd</h4>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+

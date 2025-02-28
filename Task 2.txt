@@ -1,0 +1,95 @@
+1.companies,employees and departments  migration creation
+
+* 
+public function up(): void
+{
+Schema::create('companies', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->timestamps();
+});
+}
+
+
+* 
+public function up(): void
+{
+Schema::create('employees', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->string('email');
+    $table->unsignedBigInteger('company_id');
+    $table->foreign('company_id')->references('id')->on('companies')->cascadeOnUpdate()->restrictOnDelete();
+    $table->timestamps();
+});
+}
+
+
+* 
+public function up(): void
+{
+Schema::create('departments', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->unsignedBigInteger('company_id');
+    $table->foreign('company_id')->references('id')->on('companies')->cascadeOnUpdate()->restrictOnDelete();
+    $table->timestamps();
+});
+}
+
+
+2.Related Model creation
+
+*Company.php:
+
+class Company extends Model
+{
+    protected $fillable = ['name'];
+    
+    public function employees(){
+       return $this->hasMany(Employee::class);
+    }
+    
+    public function departments(){
+       return $this->hasMany(Department::class);
+    }
+}
+
+
+*Employee.php:
+
+class Employee extends Model
+{
+    protected $fillable = ['name','email','company_id'];
+    
+    public function company(){
+       return $this->belongsTo(Company::class);
+    }
+}
+
+
+*Department.php:
+
+class Department extends Model
+{
+    protected $fillable = ['name','company_id'];
+    
+    public function company(){
+       return $this->belongsTo(Company::class);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
