@@ -49,6 +49,16 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+
+                     <!-- Employee Date of Birth -->
+                    <div class="mb-3">
+                        <label for="employeeDob" class="form-label">Date of Birth</label>
+                        <input type="date" name="date_of_birth" class="form-control @error('date_of_birth') is-invalid @enderror"
+                            id="employeeDob" value="{{ old('date_of_birth') }}" required>
+                        @error('date_of_birth')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>

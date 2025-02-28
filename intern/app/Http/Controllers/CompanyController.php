@@ -46,17 +46,20 @@ class CompanyController extends Controller
     public function insert_employee(Request $request){
         $request->validate([
             'emp_name' => 'required|string',
-            'emp_email' => 'required|email'
+            'emp_email' => 'required|email',
+            'date_of_birth' => 'required|date'
         ],[
             'emp_name.required' => 'Give a nice name for the company',
             'emp_email.required' => 'Give Email address',
-            'emp_email.email' => 'Must be email'
+            'emp_email.email' => 'Must be email',
+            'date_of_birth.required' => 'Select the Date of Birth',
         ]);
 
         Employee::create([
             'emp_name' => $request->emp_name,
             'emp_email' =>$request->emp_email,
             'company_id' =>$request->company_id,
+            'date_of_birth' => $request->date_of_birth
         ]);
 
         return redirect()->back();

@@ -10,7 +10,8 @@ class Employee extends Model
     protected $fillable = [
         'emp_name',
         'emp_email',
-        'company_id'
+        'company_id',
+        'date_of_birth'
     ];
 
     public function company(){
